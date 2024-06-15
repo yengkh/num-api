@@ -2,6 +2,7 @@ package com.num.numdb.service;
 import com.num.numdb.entity.book.BooksEntity;
 import com.num.numdb.entity.book.BooksEntityDTO;
 import com.num.numdb.repository.BooksRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +38,7 @@ public class BooksService {
         // Save File
         MultipartFile file = booksEntityDTO.getFile();
 
-        String filePath = UUID.randomUUID() + "_" + file.getOriginalFilename();
+        String filePath = file.getOriginalFilename();
 
         String uploadFileDir = "public/files/";
         Path uploadPath = Paths.get(uploadFileDir);
@@ -57,7 +58,7 @@ public class BooksService {
         PDFRenderer renderer = new PDFRenderer(document);
         BufferedImage image = renderer.renderImage(0);
         // Save the first page of the PDF as an image file
-        String imageFileName = UUID.randomUUID() + "_" +"image_for_first_page.png";
+        String imageFileName = UUID.randomUUID() + "image_for_first_page.png";
         Path imagePath = Paths.get(uploadImageDir + imageFileName);
         ImageIO.write(image, "png", imagePath.toFile());
 
@@ -76,6 +77,53 @@ public class BooksService {
     }
 
     // Update book
+    public  BooksEntity updateBook(
+            Integer id,
+            BooksEntityDTO booksEntityDTO
+    ) throws IOException {
+        BooksEntity existBook = booksRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Book with id : " + id + " not found."));
+
+        Date time = new Date();
+        // File
+        MultipartFile file = booksEntityDTO.getFile();
+        String filePath = file.getOriginalFilename();
+        String uploadDir = "public/files/";
+        Path uploadPath = Paths.get(uploadDir);
+        if(!Files.exists(uploadPath)){
+            Files.createDirectories(uploadPath);
+        }
+        try(InputStream inputStream = file.getInputStream()){
+            Files.copy(inputStream, Paths.get(uploadDir + filePath), StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        // Image
+        String uploadImageDir = "public/images/";
+        InputStream inputStream = file.getInputStream();
+        PDDocument document = PDDocument.load(inputStream);
+        PDFRenderer renderer = new PDFRenderer(document);
+        BufferedImage image = renderer.renderImage(0);
+        // Save the first page of the PDF as an image file
+        String imageFileName = UUID.randomUUID() + "_" +"image_for_first_page.png";
+        Path imagePath = Paths.get(uploadImageDir + imageFileName);
+        ImageIO.write(image, "png", imagePath.toFile());
+
+        // Save the image file path to the database
+        String imagePathStr = imageFileName;
+        document.close();
+
+        existBook.setAuthor(booksEntityDTO.getAuthor());
+        existBook.setName(booksEntityDTO.getName());
+        existBook.setFile(filePath);
+        existBook.setImage(imagePathStr);
+        existBook.setTime(time);
+
+        return  booksRepository.save(existBook);
+    }
+
+    public void deleteBookById(Integer id) {
+        booksRepository.deleteById(id);
+    }
 
     // Delete Book
 }

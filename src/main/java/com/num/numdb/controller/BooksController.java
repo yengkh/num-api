@@ -3,7 +3,6 @@ package com.num.numdb.controller;
 import com.num.numdb.entity.book.BooksEntity;
 import com.num.numdb.entity.book.BooksEntityDTO;
 import com.num.numdb.entity.professional.ProfessionalLogin;
-import com.num.numdb.entity.professional.ProfessionalLoginDTO;
 import com.num.numdb.repository.BooksRepository;
 import com.num.numdb.repository.ProfessionalLoginRepository;
 import com.num.numdb.service.BooksService;
@@ -48,18 +47,27 @@ public class BooksController {
         return booksRepository.findAll();
     }
 
-    @PostMapping("/post-prof")
-    public ProfessionalLogin postProf(
-           @ModelAttribute
-           ProfessionalLoginDTO professionalLoginDTO
-    ){
-        ProfessionalLogin professionalLogin = new ProfessionalLogin();
-        professionalLogin.setName(professionalLoginDTO.getName());
-        professionalLogin.setPasswd(professionalLoginDTO.getPasswd());
+    // Update book
+    @PutMapping("/update-book/{id}")
+    public BooksEntity updateBook(
+            @PathVariable Integer id,
+            BooksEntityDTO booksEntityDTO
+    ) throws IOException {
+        BooksEntity save = booksService.updateBook(id, booksEntityDTO);
 
-        return professionalLoginRepository.save(professionalLogin);
+        return booksRepository.save(save);
     }
 
+    // Delete book
+    @DeleteMapping("/delete-book/{id}")
+    public String deleteBook(
+            @PathVariable
+            Integer id
+    ){
+        booksService.deleteBookById(id);
+
+        return "Book with ID: " + id +" deleted successfully.";
+    }
     @GetMapping("/get-prof")
     public List<ProfessionalLogin> getProf(){
         return professionalLoginRepository.findAll();
