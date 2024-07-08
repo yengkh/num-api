@@ -10,10 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.Optional;
 
 @Service
 public class StudentService {
+    Date time = new Date();
     private final StudentRepository studentRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -44,6 +46,7 @@ public class StudentService {
 
     // Update Existing Student
     public String updateStudent(Integer id, StudentDTO studentDTO) {
+
         Optional<StudentEntity> existingStudent = studentRepository.findById(id);
         if (existingStudent.isPresent()) {
             StudentEntity student = existingStudent.get();
@@ -54,7 +57,7 @@ public class StudentService {
                 student.setStuPassword(this.passwordEncoder.encode(studentDTO.getStuPassword()));
             }
             studentRepository.save(student);
-            return student.getStuName();
+            return "Student with ID : " + id + " updated successfully!" + time;
         } else {
             throw new RuntimeException("Student not found with id: " + id);
         }
@@ -75,7 +78,10 @@ public class StudentService {
             return new LoginResponse("School ID does not match", false);
         }
 
-        return new LoginResponse("Login Success", true);
+        return new LoginResponse("Login Success" + time, true);
     }
 
+    public void deleteStudent(Integer id) {
+        studentRepository.deleteById(id);
+    }
 }

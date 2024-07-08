@@ -16,7 +16,7 @@ public class AppConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/student/save", "/student/login").permitAll()
+                        .requestMatchers("/student/save", "/student/login", "/student/update-student/{id}", "/student/delete-student/{id}").permitAll()
                         .anyRequest().authenticated()
                 );
         return http.build();
