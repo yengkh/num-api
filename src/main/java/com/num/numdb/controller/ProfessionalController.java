@@ -1,5 +1,4 @@
 package com.num.numdb.controller;
-
 import com.num.numdb.entity.professional.ProfessionalLogin;
 import com.num.numdb.service.ProfessionalService;
 import org.springframework.web.bind.annotation.*;
@@ -8,13 +7,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/prof-api")
 public class ProfessionalController {
     private final ProfessionalService professionalService;
-
     public ProfessionalController(
             ProfessionalService professionalService
     ) {
         this.professionalService = professionalService;
     }
-
     // Add Teacher
     @PostMapping("/add-teacher")
     public ProfessionalLogin addTeacher(
@@ -23,7 +20,6 @@ public class ProfessionalController {
     ){
         return professionalService.addTeacher(professionalLogin);
     }
-
     // Get Teacher
     @GetMapping("/get-teacher/{name}")
     public ProfessionalLogin getTeacher(
@@ -32,7 +28,6 @@ public class ProfessionalController {
     ){
         return professionalService.findByName(name);
     }
-
     // Update Teacher
     @PutMapping("/update-teacher")
     public ProfessionalLogin updateTeacher(
@@ -43,7 +38,6 @@ public class ProfessionalController {
     ){
         return professionalService.updateTeacher(id, professionalLogin);
     }
-
     // Delete teacher
     @DeleteMapping("/delete-teacher/{id}")
     public String deleteStudent(
@@ -53,5 +47,4 @@ public class ProfessionalController {
         professionalService.deleteTeacherById(id);
         return "Teacher with ID : " + id + " deleted successfully.";
     }
-
 }

@@ -14,6 +14,7 @@ public class ProfessionalLogin {
         this.id = id;
         this.name = name;
         this.passwd = passwd;
+
     }
 
     public ProfessionalLogin(String name, String passwd) {
